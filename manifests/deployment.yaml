@@ -1,0 +1,29 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: entrenamiento
+  labels: 
+     app: entrenamiento
+
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: entrenamiento
+
+  template:
+    metadata:
+      labels:
+        app: entrenamiento
+    spec:
+      containers:
+      - name: entrenamiento
+        image: DOCKER_IMAGE
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
