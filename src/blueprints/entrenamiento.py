@@ -7,14 +7,14 @@ entrenamientos_blueprint = Blueprint('entrenamientos', __name__)
 
 @entrenamientos_blueprint.route('/entrenamientos', methods = ['POST'])
 def create():
-    user = CreateEntrenamiento(request.get_json()).execute()
-    return jsonify(user), 201
+    entrenamiento = CreateEntrenamiento(request.get_json()).execute()
+    return jsonify(entrenamiento), 201
 
 @entrenamientos_blueprint.route('/entrenamientos/<id>', methods = ['GET'])
 def show(id):
     """ Authenticate(auth_token()).execute() """
-    ejercicio = GetEntrenamiento(id).execute() 
-    return jsonify(ejercicio)
+    entrenamiento = GetEntrenamiento(id).execute() 
+    return jsonify(entrenamiento)
 
 @entrenamientos_blueprint.route('/', methods = ['GET'])
 def ping():

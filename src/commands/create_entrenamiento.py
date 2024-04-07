@@ -1,6 +1,6 @@
+import uuid
 from .base_command import BaseCommannd
-from ..models.entrenamiento import Entrenamiento, EntrenamientoSchema, EntrenamientoJsonSchema
-from ..session import Session
+from ..models.entrenamiento import Entrenamiento
 from ..errors.errors import IncompleteParams, InvalidNombreError, EntrenamientoAlreadyExists
 from .. import dynamodb_entrenamiento
 
@@ -10,38 +10,31 @@ class CreateEntrenamiento(BaseCommannd):
   
   def execute(self):
     try:
-      posted_entrenamiento = EntrenamientoSchema(
-        only=('nombre', 'fecha_entrenamiento', 'id_usuario', 'estado')
-      ).load(self.data)
+      
+      posted_entrenamiento = Entrenamiento(str(uuid.uuid4()),self.data['nombre'], self.data['fecha_entrenamiento'], self.data['id_usuario'], self.data['estado'])
       print(posted_entrenamiento)
       
-      if not self.verificar_datos(posted_entrenamiento["nombre"]):
+      if not self.verificar_datos(self.data['nombre']):
          raise InvalidNombreError
       
-      entrenamiento = Entrenamiento(**posted_entrenamiento)
-      session = Session()
-      
-      if self.entrenamiento_exist(session, self.data['nombre']):
-        session.close()
+      if self.entrenamiento_exist(self.data['nombre']):
         raise EntrenamientoAlreadyExists()
 
-      session.add(entrenamiento)
-      session.commit()
+      dynamodb_entrenamiento.insert_item(posted_entrenamiento)
 
-      dynamodb_entrenamiento.insert_item(entrenamiento)
-
-      new_entrenamiento = EntrenamientoSchema().dump(entrenamiento)
-      session.close()
-
-      return new_entrenamiento
+      return posted_entrenamiento.to_dict()
         
     except TypeError as te:
       print("Error en el primer try:", str(te))
       raise IncompleteParams()
   
-  def entrenamiento_exist(self, session, nombre):
-    return len(session.query(Entrenamiento).filter_by(nombre=nombre).all()) > 0
-  
+  def entrenamiento_exist(self, nombre):
+    result = dynamodb_entrenamiento.get_Item_nombre(nombre)
+    if result is None:
+      return False
+    else:
+      return True
+      
   def verificar_datos(self,nombre):
     if nombre and nombre.strip():
         return True
