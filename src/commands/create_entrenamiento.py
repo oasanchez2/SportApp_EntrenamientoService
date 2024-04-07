@@ -2,6 +2,7 @@ from .base_command import BaseCommannd
 from ..models.entrenamiento import Entrenamiento, EntrenamientoSchema, EntrenamientoJsonSchema
 from ..session import Session
 from ..errors.errors import IncompleteParams, InvalidNombreError, EntrenamientoAlreadyExists
+from .. import dynamodb_entrenamiento
 
 class CreateEntrenamiento(BaseCommannd):
   def __init__(self, data):
@@ -26,6 +27,8 @@ class CreateEntrenamiento(BaseCommannd):
 
       session.add(entrenamiento)
       session.commit()
+
+      dynamodb_entrenamiento.insert_item(entrenamiento)
 
       new_entrenamiento = EntrenamientoSchema().dump(entrenamiento)
       session.close()

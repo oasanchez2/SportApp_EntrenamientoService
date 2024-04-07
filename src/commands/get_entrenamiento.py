@@ -2,6 +2,7 @@ from .base_command import BaseCommannd
 from ..models.entrenamiento import Entrenamiento, EntrenamientoSchema, EntrenamientoJsonSchema
 from ..session import Session
 from ..errors.errors import Unauthorized, InvalidParams, EntrenamientoNotFoundError
+from .. import dynamodb_entrenamiento
 
 class GetEntrenamiento (BaseCommannd):
   def __init__(self, entrenamiento_id):
@@ -24,7 +25,8 @@ class GetEntrenamiento (BaseCommannd):
     entrenamiento = schema.dump(entrenamiento)
 
     session.close()
-
+    result  = dynamodb_entrenamiento.get_item(self.entrenamiento_id)
+    print(result)
     return entrenamiento
   
       
