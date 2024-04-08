@@ -1,40 +1,21 @@
-from marshmallow import  Schema, fields
-from sqlalchemy import Column, String, Boolean, DateTime,Integer
-from .model import Model, Base
-from datetime import datetime, timedelta
+from typing import Optional
+from datetime import datetime
 
-class Entrenamiento(Model, Base):
-  __tablename__ = 'entrenamiento'
+class Entrenamiento():
 
-  nombre = Column(String)
-  fecha_entrenamiento = Column(DateTime)
-  id_usuario = Column(Integer)
-  estado = Column(Boolean)
-
-  def __init__(self, nombre, fecha_entrenamiento, id_usuario, estado):
-    Model.__init__(self)
+  def __init__(self, id_entrenamiento: str, nombre: str, fecha_entrenamiento: datetime, id_usuario: str, estado: bool):
+    self.id_entrenamiento = id_entrenamiento
     self.nombre = nombre
     self.fecha_entrenamiento = fecha_entrenamiento
     self.id_usuario = id_usuario
     self.estado = estado
-    
-class EntrenamientoSchema(Schema):
-  id = fields.Number()
-  nombre = fields.Str()
-  fecha_entrenamiento = fields.DateTime()
-  id_usuario = fields.Number()
-  estado = fields.Bool()
-  expireAt = fields.DateTime()
-  createdAt = fields.DateTime()
- 
 
-class EntrenamientoJsonSchema(Schema):
-  id = fields.Number()
-  nombre = fields.Str()
-  fecha_entrenamiento = fields.DateTime()
-  id_usuario = fields.Number()
-  estado = fields.Bool()
-  expireAt = fields.DateTime()
-  createdAt = fields.DateTime()
-  
+  def to_dict(self):
+        return {
+            "id_entrenamiento": self.id_entrenamiento,
+            "nombre": self.nombre,
+            "fecha_entrenamiento": self.fecha_entrenamiento,
+            "id_usuario": self.id_usuario,
+            "estado": self.estado
+        }
   
