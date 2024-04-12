@@ -2,6 +2,7 @@ import boto3
 import os
 import json
 from boto3.dynamodb.conditions import Key, Attr
+#from .models.entrenamiento import Entrenamiento
 from .models.entrenamiento import Entrenamiento
 from botocore.exceptions import ClientError
 
@@ -49,7 +50,19 @@ def insert_item(entrenamiento: Entrenamiento):
         'nombre': {'S': entrenamiento.nombre },
         'fecha_entrenamiento': {'S': entrenamiento.fecha_entrenamiento},  # Datetime conversion
         'id_usuario': {'S': entrenamiento.id_usuario },
-        'estado': {'BOOL': entrenamiento.estado }
+        'estado': {'BOOL': entrenamiento.estado },
+        'ejercicios': {'L': [
+            {
+                'M': {
+                    'estado': {'BOOL': ejercicio.estado},
+                    'id_ejercicio': {'S': ejercicio.id_ejercicio},
+                    'nombre': {'S': ejercicio.nombre},
+                    'url_imagen': {'S': ejercicio.url_imagen},
+                    'numero_repeticiones': {'N': str(ejercicio.numero_repeticiones)}
+                }
+            }
+            for ejercicio in entrenamiento.ejercicios
+        ]}
         # Puedes agregar más atributos según la definición de tu tabla
     }
     result = dynamodb.put_item(
@@ -78,13 +91,23 @@ def get_item(id_entrenamiento):
     id_usuario = item['id_usuario']['S']
     estado = item['estado']['BOOL']
 
+    # Extrae los ejercicios del item
+    ejercicios = []
+    if 'ejercicios' in item:
+        for ejercicio_item in item['ejercicios']['L']:
+            ejercicio = {
+                'estado': ejercicio_item['M']['estado']['BOOL'],
+                'id_ejercicio': ejercicio_item['M']['id_ejercicio']['S'],
+                'nombre': ejercicio_item['M']['nombre']['S'],
+                'url_imagen': ejercicio_item['M']['url_imagen']['S'],
+                'numero_repeticiones': int(ejercicio_item['M']['numero_repeticiones']['N'])
+            }
+            ejercicios.append(ejercicio)
+
     # Crea una instancia de la clase Entrenamiento
-    entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado)
+    entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado, ejercicios=ejercicios)
 
-    # Serializa el objeto a JSON utilizando el método to_dict()
-    json_entrenamiento = entrenamiento.to_dict()
-
-    return json_entrenamiento
+    return entrenamiento
 
 def get_Item_nombre(nombre):
     
@@ -118,7 +141,7 @@ def get_Item_nombre(nombre):
         estado = item['estado']['BOOL']
 
         entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado)
-        resultados.append(entrenamiento.to_dict())
+        resultados.append(entrenamiento)
 
     return resultados
 
