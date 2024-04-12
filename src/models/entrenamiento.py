@@ -1,21 +1,20 @@
-from typing import Optional
+from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 
-class Entrenamiento():
+@dataclass
+class Ejercicio:
+    estado: bool
+    id_ejercicio: str
+    nombre: str
+    url_imagen: str
+    numero_repeticiones: int
 
-  def __init__(self, id_entrenamiento: str, nombre: str, fecha_entrenamiento: datetime, id_usuario: str, estado: bool):
-    self.id_entrenamiento = id_entrenamiento
-    self.nombre = nombre
-    self.fecha_entrenamiento = fecha_entrenamiento
-    self.id_usuario = id_usuario
-    self.estado = estado
-
-  def to_dict(self):
-        return {
-            "id_entrenamiento": self.id_entrenamiento,
-            "nombre": self.nombre,
-            "fecha_entrenamiento": self.fecha_entrenamiento,
-            "id_usuario": self.id_usuario,
-            "estado": self.estado
-        }
-  
+@dataclass
+class Entrenamiento:
+    id_entrenamiento: str
+    nombre: str
+    fecha_entrenamiento: datetime
+    id_usuario: str
+    estado: bool
+    ejercicios: List[Ejercicio]
