@@ -140,7 +140,20 @@ def get_Item_nombre(nombre):
         id_usuario = item['id_usuario']['S']
         estado = item['estado']['BOOL']
 
-        entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado)
+        # Extrae los ejercicios del item
+        ejercicios = []
+        if 'ejercicios' in item:
+            for ejercicio_item in item['ejercicios']['L']:
+                ejercicio = {
+                    'estado': ejercicio_item['M']['estado']['BOOL'],
+                    'id_ejercicio': ejercicio_item['M']['id_ejercicio']['S'],
+                    'nombre': ejercicio_item['M']['nombre']['S'],
+                    'url_imagen': ejercicio_item['M']['url_imagen']['S'],
+                    'numero_repeticiones': int(ejercicio_item['M']['numero_repeticiones']['N'])
+                }
+                ejercicios.append(ejercicio)
+
+        entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado,  ejercicios=ejercicios)
         resultados.append(entrenamiento)
 
     return resultados
