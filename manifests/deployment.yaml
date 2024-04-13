@@ -22,6 +22,11 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: ENV1
+        - name: AWS_SECRET_ACCESS_KEY
+          value: ENV2
   strategy:
     type: RollingUpdate
     rollingUpdate:
