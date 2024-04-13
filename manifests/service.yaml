@@ -5,13 +5,14 @@ metadata:
   labels:
     app: entrenamiento
 spec:
+  type: ClusterIP
   selector:
     app: entrenamiento
 
   ports:
     - port: 80
       targetPort: 5000
-      
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
