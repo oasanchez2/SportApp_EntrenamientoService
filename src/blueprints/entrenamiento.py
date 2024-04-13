@@ -16,7 +16,7 @@ def show(id):
     entrenamiento = GetEntrenamiento(id).execute() 
     return jsonify(entrenamiento)
 
-@entrenamientos_blueprint.route('/', methods = ['GET'])
+@entrenamientos_blueprint.route('/entrenamientos/ping', methods = ['GET'])
 def ping():
     return 'pong'
 
