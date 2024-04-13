@@ -9,8 +9,25 @@ spec:
     app: entrenamiento
 
   ports:
-    - port: 5000
+    - port: 80
       targetPort: 5000
-
-  type: LoadBalancer
-
+      
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: entrenamiento-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: a1b7563a0858f4f71b48c713a5de8c20-991979942.us-east-1.elb.amazonaws.com
+      http:
+        paths:
+          - path: /entrenamiento
+            pathType: Prefix
+            backend:
+              service:
+                name: entrenamiento
+                port:
+                  number: 80
