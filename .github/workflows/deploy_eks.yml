@@ -6,6 +6,8 @@ env:
   ECR_REPOSITORY: entrenamiento
   EKS_CLUSTER_NAME: sportapp
   AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 jobs:
   build:
     name: Deployment
@@ -40,5 +42,7 @@ jobs:
         IMAGE_TAG: ${{ steps.commit.outputs.short }}
       run: |
         sed -i.bak "s|DOCKER_IMAGE|$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifests/deployment.yaml && \
+        sed -i.bak "s|ENV1|$AWS_ACCESS_KEY_ID|g" manifests/deployment.yaml && \
+        sed -i.bak "s|ENV2|$AWS_SECRET_ACCESS_KEY|g" manifests/deployment.yaml && \
         kubectl apply -f manifests/deployment.yaml --validate=false
         kubectl apply -f manifests/service.yaml --validate=false
