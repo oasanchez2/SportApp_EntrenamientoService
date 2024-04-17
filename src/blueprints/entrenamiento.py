@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, Blueprint
 from ..commands.create_entrenamiento import CreateEntrenamiento
 from ..commands.get_entrenamiento import GetEntrenamiento
+from ..commands.get_entrenamientos_user import GetEntrenamientosUser
 from ..commands.reset import Reset
 
 entrenamientos_blueprint = Blueprint('entrenamientos', __name__)
@@ -14,6 +15,12 @@ def create():
 def show(id):
     """ Authenticate(auth_token()).execute() """
     entrenamiento = GetEntrenamiento(id).execute() 
+    return jsonify(entrenamiento)
+
+@entrenamientos_blueprint.route('/entrenamientos/user/<id>', methods = ['GET'])
+def show_user(id):
+    """ Authenticate(auth_token()).execute() """
+    entrenamiento = GetEntrenamientosUser(id).execute() 
     return jsonify(entrenamiento)
 
 @entrenamientos_blueprint.route('/entrenamientos/ping', methods = ['GET'])
