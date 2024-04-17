@@ -1,6 +1,6 @@
 from .base_command import BaseCommannd
 from ..errors.errors import Unauthorized, InvalidParams, EntrenamientoNotFoundError
-from .. import dynamodb_entrenamiento
+from ..dynamodb_entrenamiento import DynamoDbEntrenamiento
 
 class GetEntrenamiento (BaseCommannd):
   def __init__(self, entrenamiento_id):
@@ -11,7 +11,7 @@ class GetEntrenamiento (BaseCommannd):
   
   def execute(self):
 
-    result  = dynamodb_entrenamiento.get_item(self.entrenamiento_id)
+    result  = DynamoDbEntrenamiento().get_item(self.entrenamiento_id)
     if result is None:
       raise EntrenamientoNotFoundError()
     

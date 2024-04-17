@@ -1,7 +1,7 @@
 from .base_command import BaseCommannd
-from .. import dynamodb_entrenamiento
+from ..dynamodb_entrenamiento import DynamoDbEntrenamiento
 
 class Reset(BaseCommannd):  
   def execute(self):
-    dynamodb_entrenamiento.deleteTable()
-    dynamodb_entrenamiento.create_table()
+    DynamoDbEntrenamiento().deleteTable()
+    DynamoDbEntrenamiento().create_table()
