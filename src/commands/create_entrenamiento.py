@@ -3,7 +3,7 @@ from .base_command import BaseCommannd
 #from ..models.entrenamiento import Entrenamiento
 from ..models.entrenamiento import Entrenamiento, Ejercicio
 from ..errors.errors import IncompleteParams, InvalidNombreError, EntrenamientoAlreadyExists
-from .. import dynamodb_entrenamiento
+from ..dynamodb_entrenamiento import DynamoDbEntrenamiento
 
 class CreateEntrenamiento(BaseCommannd):
   def __init__(self, data):
@@ -33,7 +33,7 @@ class CreateEntrenamiento(BaseCommannd):
       if self.entrenamiento_exist(self.data['nombre']):
         raise EntrenamientoAlreadyExists()
 
-      dynamodb_entrenamiento.insert_item(posted_entrenamiento)
+      DynamoDbEntrenamiento().insert_item(posted_entrenamiento)
 
       return posted_entrenamiento
         
@@ -42,7 +42,7 @@ class CreateEntrenamiento(BaseCommannd):
       raise IncompleteParams()
   
   def entrenamiento_exist(self, nombre):
-    result = dynamodb_entrenamiento.get_Item_nombre(nombre)
+    result = DynamoDbEntrenamiento().get_Item_nombre(nombre)
     if result is None:
       return False
     else:
