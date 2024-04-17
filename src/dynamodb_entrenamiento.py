@@ -158,6 +158,55 @@ class DynamoDbEntrenamiento():
             resultados.append(entrenamiento)
 
         return resultados
+    
+    def get_Items_user(self,id_usuario):
+        
+        # Parámetros para la operación de escaneo
+        parametros = {
+            'TableName': self.table_name,
+            'FilterExpression': '#id_usuario = :id_usuario',
+            'ExpressionAttributeNames': {
+                '#id_usuario': 'id_usuario'
+            },
+            'ExpressionAttributeValues': {
+                ':id_usuario': {'S': id_usuario}
+            }
+        }
+    
+        # Realizar el escaneo
+        response = self.dynamodb.scan(**parametros)
+        print(response)
+        # Obtener los items encontrados
+        items = response.get('Items', [])
+        if not items:
+            return None
+        
+        # Procesar los items encontrados
+        resultados = []
+        for item in items:
+            id_entrenamiento = item['id_entrenamiento']['S']
+            nombre = item['nombre']['S']
+            fecha_entrenamiento = item['fecha_entrenamiento']['S']
+            id_usuario = item['id_usuario']['S']
+            estado = item['estado']['BOOL']
+
+            # Extrae los ejercicios del item
+            ejercicios = []
+            if 'ejercicios' in item:
+                for ejercicio_item in item['ejercicios']['L']:
+                    ejercicio = {
+                        'estado': ejercicio_item['M']['estado']['BOOL'],
+                        'id_ejercicio': ejercicio_item['M']['id_ejercicio']['S'],
+                        'nombre': ejercicio_item['M']['nombre']['S'],
+                        'url_imagen': ejercicio_item['M']['url_imagen']['S'],
+                        'numero_repeticiones': int(ejercicio_item['M']['numero_repeticiones']['N'])
+                    }
+                    ejercicios.append(ejercicio)
+
+            entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado,  ejercicios=ejercicios)
+            resultados.append(entrenamiento)
+
+        return resultados
 
     def tablaExits(self,name):
         try:
