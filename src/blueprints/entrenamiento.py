@@ -3,6 +3,7 @@ from ..commands.create_entrenamiento import CreateEntrenamiento
 from ..commands.get_entrenamiento import GetEntrenamiento
 from ..commands.get_entrenamientos_user import GetEntrenamientosUser
 from ..commands.reset import Reset
+from ..commands.get_ultimo_entrenamientos_user import GetUltimosEntrenamientosUser
 
 entrenamientos_blueprint = Blueprint('entrenamientos', __name__)
 
@@ -22,6 +23,12 @@ def show_user(id):
     """ Authenticate(auth_token()).execute() """
     entrenamiento = GetEntrenamientosUser(id).execute() 
     return jsonify(entrenamiento)
+
+@entrenamientos_blueprint.route('/entrenamientos/user/completados/<id>/<dias>', methods = ['GET'])
+def show_entrenamientos_completados(id,dias):
+    """ Authenticate(auth_token()).execute() """
+    cantidad = GetUltimosEntrenamientosUser(id,dias).execute() 
+    return jsonify(cantidad)
 
 @entrenamientos_blueprint.route('/entrenamientos/ping', methods = ['GET'])
 def ping():

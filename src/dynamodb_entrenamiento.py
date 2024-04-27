@@ -205,6 +205,56 @@ class DynamoDbEntrenamiento():
 
         return resultados
 
+    def get_entrenamientos_user_ultimo_dias(self,id_usuario, fecha_desde, fecha_actual):
+        
+        # Parámetros para la operación de escaneo
+        parametros = {
+            'TableName': self.table_name,
+            'FilterExpression': '#id_usuario = :id_usuario AND #fecha_entrenamiento >= :fecha_desde AND #fecha_entrenamiento <= :fecha_actual',
+            'ExpressionAttributeNames': {
+                '#id_usuario': 'id_usuario',
+                '#fecha_entrenamiento': 'fecha_entrenamiento'
+            },
+            'ExpressionAttributeValues': {
+                ':id_usuario': {'S': id_usuario},
+                ':fecha_desde': {'S': fecha_desde},
+                ':fecha_actual': {'S': fecha_actual}
+            }
+        }
+    
+        # Realizar el escaneo
+        response = self.dynamodb.scan(**parametros)
+        #print(response)
+        # Obtener los items encontrados
+        items = response.get('Items', [])
+        
+        # Procesar los items encontrados
+        resultados = []
+        for item in items:
+            id_entrenamiento = item['id_entrenamiento']['S']
+            nombre = item['nombre']['S']
+            fecha_entrenamiento = item['fecha_entrenamiento']['S']
+            id_usuario = item['id_usuario']['S']
+            estado = item['estado']['BOOL']
+
+            # Extrae los ejercicios del item
+            ejercicios = []
+            if 'ejercicios' in item:
+                for ejercicio_item in item['ejercicios']['L']:
+                    ejercicio = {
+                        'estado': ejercicio_item['M']['estado']['BOOL'],
+                        'id_ejercicio': ejercicio_item['M']['id_ejercicio']['S'],
+                        'nombre': ejercicio_item['M']['nombre']['S'],
+                        'url_imagen': ejercicio_item['M']['url_imagen']['S'],
+                        'numero_repeticiones': int(ejercicio_item['M']['numero_repeticiones']['N'])
+                    }
+                    ejercicios.append(ejercicio)
+
+            entrenamiento = Entrenamiento(id_entrenamiento,nombre, fecha_entrenamiento, id_usuario, estado,  ejercicios=ejercicios)
+            resultados.append(entrenamiento)
+
+        return resultados
+    
     def tablaExits(self,name):
         try:
             response = self.dynamodb.describe_table(TableName=name)
