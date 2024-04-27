@@ -16,10 +16,9 @@ class GetUltimosEntrenamientosUser (BaseCommannd):
         raise InvalidParams()
     
   def execute(self):
-    # Calcular la fecha de hace un mes
     fecha_desde = (datetime.now() - timedelta(days=self.dias)).strftime('%Y-%m-%d')
     fecha_actual = datetime.now().strftime('%Y-%m-%d')
-    print(fecha_desde)
+
     result  = DynamoDbEntrenamiento().get_entrenamientos_user_ultimo_dias(self.id_usuario,fecha_desde,fecha_actual)
 
     return { 'completados': len(result) }
